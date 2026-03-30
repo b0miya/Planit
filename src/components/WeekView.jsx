@@ -94,16 +94,46 @@ export default function WeekView() {
           </div>
         </div>
 
-        {/* 평일 열 (월~금) */}
-        <div className="weekdays-area">
-          {weekDays.slice(0, 5).map((day, di) => {
+        {/* 전체 7일 열 */}
+        <div className="days-area">
+          {weekDays.map((day, di) => {
             const dateStr = formatDate(day)
             const data = dailyData[dateStr] || {}
             const isToday = dateStr === today
             const isSel = !editMode && dateStr === selectedDate
+            const isWeekend = di >= 5
+
+            if (isWeekend) {
+              return (
+                <div
+                  key={di}
+                  className={`weekend-col ${isToday ? 'col-today' : ''} ${isSel ? 'col-selected' : ''}`}
+                  onClick={() => handleDayClick(day)}
+                >
+                  <div className="day-header" style={{ height: HEADER_H }}>
+                    <span className="day-name weekend-name">{DAY_LABELS[di]}</span>
+                    <span className={`day-date ${isToday ? 'today-badge' : ''}`}>
+                      {day.getMonth()+1}/{day.getDate()}
+                    </span>
+                  </div>
+                  <div className="weekend-content" style={{ height: WEEKEND_H }}>
+                    {data.todos?.length > 0 ? (
+                      <ul className="weekend-todos">
+                        {data.todos.map(t => (
+                          <li key={t.id} className={t.done ? 'done' : ''}>{t.done ? '✓' : '○'} {t.text}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span className="weekend-empty">클릭하여{'\n'}일정 추가</span>
+                    )}
+                    {data.diary && <p className="weekend-diary">{data.diary.slice(0, 60)}</p>}
+                  </div>
+                </div>
+              )
+            }
+
             const doneTodos = data.todos?.filter(t => t.done).length || 0
             const totalTodos = data.todos?.length || 0
-
             return (
               <div
                 key={di}
@@ -166,43 +196,6 @@ export default function WeekView() {
                       ? <span className="note-preview">{data.afterWork.slice(0, 28)}</span>
                       : <span className="slot-empty">+</span>
                   )}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* 주말 열 (토/일) */}
-        <div className="weekend-area">
-          {weekDays.slice(5).map((day, wi) => {
-            const dateStr = formatDate(day)
-            const data = dailyData[dateStr] || {}
-            const isToday = dateStr === today
-            const isSel = !editMode && dateStr === selectedDate
-
-            return (
-              <div
-                key={wi}
-                className={`weekend-col ${isToday ? 'col-today' : ''} ${isSel ? 'col-selected' : ''}`}
-                onClick={() => handleDayClick(day)}
-              >
-                <div className="day-header" style={{ height: HEADER_H }}>
-                  <span className="day-name weekend-name">{DAY_LABELS[5+wi]}</span>
-                  <span className={`day-date ${isToday ? 'today-badge' : ''}`}>
-                    {day.getMonth()+1}/{day.getDate()}
-                  </span>
-                </div>
-                <div className="weekend-content" style={{ height: WEEKEND_H }}>
-                  {data.todos?.length > 0 ? (
-                    <ul className="weekend-todos">
-                      {data.todos.map(t => (
-                        <li key={t.id} className={t.done ? 'done' : ''}>{t.done ? '✓' : '○'} {t.text}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <span className="weekend-empty">클릭하여{'\n'}일정 추가</span>
-                  )}
-                  {data.diary && <p className="weekend-diary">{data.diary.slice(0, 60)}</p>}
                 </div>
               </div>
             )

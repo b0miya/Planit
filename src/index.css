@@ -315,8 +315,8 @@ html, body, #root {
   color: var(--color-text);
 }
 
-/* 평일 영역 */
-.weekdays-area {
+/* 전체 날짜 영역 (월~일 7열) */
+.days-area {
   flex: 1;
   display: flex;
   flex-direction: row;
@@ -462,9 +462,9 @@ html, body, #root {
 
 /* 주말 영역 */
 .weekend-area {
+  flex: 2;
   display: flex;
   flex-direction: row;
-  flex-shrink: 0;
 }
 
 .weekend-col {
@@ -475,10 +475,6 @@ html, body, #root {
   cursor: pointer;
   background: var(--color-weekend);
   transition: background 0.12s;
-}
-
-.weekend-col:first-child {
-  border-left-width: 2px;
 }
 
 .weekend-col + .weekend-col {
