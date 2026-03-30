@@ -20,8 +20,8 @@ function calcDuration(start, end) {
 }
 
 export default function Settings() {
-  const { timetable, setPage, updatePeriod, setClassAssignment, setWorkTime } = useStore()
-  const { periods, schedule, workStart, workEnd } = timetable
+  const { timetable, setPage, updatePeriod, setClassAssignment, setWorkTime, setLunchBreak } = useStore()
+  const { periods, schedule, workStart, workEnd, lunchBreak } = timetable
   const [localWorkStart, setLocalWorkStart] = useState(workStart)
   const [localWorkEnd, setLocalWorkEnd] = useState(workEnd)
   const [saved, setSaved] = useState(false)
@@ -81,29 +81,55 @@ export default function Settings() {
                 <span>종료</span>
                 <span>수업 시간</span>
               </div>
-              {periods.map(p => (
-                <div key={p.id} className="period-time-row">
-                  <span className="period-time-label">{p.label}</span>
-                  <input
-                    type="text"
-                    className="time-input"
-                    placeholder="09:00"
-                    maxLength={5}
-                    value={p.start}
-                    onChange={e => { updatePeriod(p.id, 'start', formatTimeInput(e.target.value)); flash() }}
-                  />
-                  <span className="time-tilde">~</span>
-                  <input
-                    type="text"
-                    className="time-input"
-                    placeholder="09:45"
-                    maxLength={5}
-                    value={p.end}
-                    onChange={e => { updatePeriod(p.id, 'end', formatTimeInput(e.target.value)); flash() }}
-                  />
-                  <span className="duration-badge">{calcDuration(p.start, p.end)}</span>
-                </div>
-              ))}
+              {periods.flatMap(p => {
+                const row = (
+                  <div key={p.id} className="period-time-row">
+                    <span className="period-time-label">{p.label}</span>
+                    <input
+                      type="text"
+                      className="time-input"
+                      placeholder="09:00"
+                      maxLength={5}
+                      value={p.start}
+                      onChange={e => { updatePeriod(p.id, 'start', formatTimeInput(e.target.value)); flash() }}
+                    />
+                    <span className="time-tilde">~</span>
+                    <input
+                      type="text"
+                      className="time-input"
+                      placeholder="09:45"
+                      maxLength={5}
+                      value={p.end}
+                      onChange={e => { updatePeriod(p.id, 'end', formatTimeInput(e.target.value)); flash() }}
+                    />
+                    <span className="duration-badge">{calcDuration(p.start, p.end)}</span>
+                  </div>
+                )
+                if (p.id === 4) return [row, (
+                  <div key="lunch" className="period-time-row lunch-time-row">
+                    <span className="period-time-label lunch-row-label">점심</span>
+                    <input
+                      type="text"
+                      className="time-input"
+                      placeholder="12:30"
+                      maxLength={5}
+                      value={lunchBreak?.start || '12:30'}
+                      onChange={e => { setLunchBreak(formatTimeInput(e.target.value), lunchBreak?.end || '13:30'); flash() }}
+                    />
+                    <span className="time-tilde">~</span>
+                    <input
+                      type="text"
+                      className="time-input"
+                      placeholder="13:30"
+                      maxLength={5}
+                      value={lunchBreak?.end || '13:30'}
+                      onChange={e => { setLunchBreak(lunchBreak?.start || '12:30', formatTimeInput(e.target.value)); flash() }}
+                    />
+                    <span className="duration-badge">{calcDuration(lunchBreak?.start, lunchBreak?.end)}</span>
+                  </div>
+                )]
+                return [row]
+              })}
             </div>
 
             <p className="settings-hint" style={{ marginTop: 12 }}>

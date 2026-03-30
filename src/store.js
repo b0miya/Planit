@@ -36,6 +36,7 @@ const useStore = create(
         schedule: makeDefaultSchedule(),
         workStart: '08:30',
         workEnd: '17:00',
+        lunchBreak: { start: '12:30', end: '13:30' },
       },
 
       dailyData: {},
@@ -54,6 +55,9 @@ const useStore = create(
 
       setWorkTime: (workStart, workEnd) =>
         set(s => ({ timetable: { ...s.timetable, workStart, workEnd } })),
+
+      setLunchBreak: (start, end) =>
+        set(s => ({ timetable: { ...s.timetable, lunchBreak: { start, end } } })),
 
       updatePeriod: (id, field, value) =>
         set(s => ({

@@ -460,6 +460,37 @@ html, body, #root {
   word-break: keep-all;
 }
 
+/* 점심시간 */
+.lunch-time-row {
+  background: #fef9c3;
+}
+
+.lunch-row-label {
+  color: #92400e !important;
+  font-weight: 700;
+}
+
+.lunch-time-slot {
+  background: #fef9c3;
+  border-bottom: 1px solid #fde68a;
+}
+
+.lunch-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fef9c3;
+  border-bottom: 1px solid #fde68a;
+  flex-shrink: 0;
+}
+
+.lunch-label {
+  font-size: 11px;
+  color: #92400e;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
 /* 주말 영역 */
 .weekend-area {
   flex: 2;

@@ -15,7 +15,7 @@ export default function WeekView() {
     weekOffset, prevWeek, nextWeek, goToToday,
     selectedDate, setSelectedDate,
     timetable, dailyData,
-    setClassAssignment, updatePeriod, setWorkTime,
+    setClassAssignment, updatePeriod, setWorkTime, setLunchBreak,
   } = useStore()
 
   const [editMode, setEditMode] = useState(false)
@@ -26,11 +26,12 @@ export default function WeekView() {
   const weekEnd = weekDays[6]
   const rangeLabel = `${weekStart.getFullYear()}년 ${weekStart.getMonth()+1}월 ${weekStart.getDate()}일 ~ ${weekEnd.getMonth()+1}월 ${weekEnd.getDate()}일`
 
-  const { periods, schedule, workStart, workEnd } = timetable
+  const { periods, schedule, workStart, workEnd, lunchBreak } = timetable
 
   const HEADER_H = 52
   const SLOT_H = 64
-  const PERIOD_H = editMode ? 80 : 70   // 편집 모드에서 입력 공간 확보
+  const PERIOD_H = editMode ? 80 : 70
+  const LUNCH_H = editMode ? 60 : 48
   const WEEKEND_H = SLOT_H + periods.length * PERIOD_H + SLOT_H
 
   const handleDayClick = (day) => {
@@ -89,24 +90,44 @@ export default function WeekView() {
               <span className="time-text">{workStart}</span>
             )}
           </div>
-          {periods.map(p => (
-            <div key={p.id} className="time-slot" style={{ height: PERIOD_H }}>
-              <span className="period-label-text">{p.label}</span>
-              {editMode ? (
-                <input
-                  type="text"
-                  className="time-edit-input"
-                  placeholder="09:00"
-                  maxLength={5}
-                  value={p.start}
-                  onChange={e => updatePeriod(p.id, 'start', formatTimeInput(e.target.value))}
-                  title={`${p.label} 시작 시간`}
-                />
-              ) : (
-                <span className="time-text">{p.start}</span>
-              )}
-            </div>
-          ))}
+          {periods.flatMap(p => {
+            const row = (
+              <div key={p.id} className="time-slot" style={{ height: PERIOD_H }}>
+                <span className="period-label-text">{p.label}</span>
+                {editMode ? (
+                  <input
+                    type="text"
+                    className="time-edit-input"
+                    placeholder="09:00"
+                    maxLength={5}
+                    value={p.start}
+                    onChange={e => updatePeriod(p.id, 'start', formatTimeInput(e.target.value))}
+                    title={`${p.label} 시작 시간`}
+                  />
+                ) : (
+                  <span className="time-text">{p.start}</span>
+                )}
+              </div>
+            )
+            if (p.id === 4) return [row, (
+              <div key="lunch-time" className="time-slot lunch-time-slot" style={{ height: LUNCH_H }}>
+                <span className="slot-label">점심</span>
+                {editMode ? (
+                  <input
+                    type="text"
+                    className="time-edit-input"
+                    placeholder="12:30"
+                    maxLength={5}
+                    value={lunchBreak?.start || '12:30'}
+                    onChange={e => setLunchBreak(formatTimeInput(e.target.value), lunchBreak?.end || '13:30')}
+                  />
+                ) : (
+                  <span className="time-text">{lunchBreak?.start}</span>
+                )}
+              </div>
+            )]
+            return [row]
+          })}
           <div className="time-slot time-slot-edge" style={{ height: SLOT_H }}>
             <span className="slot-label">퇴근후</span>
             {editMode ? (
@@ -191,10 +212,10 @@ export default function WeekView() {
                 </div>
 
                 {/* 교시 셀 */}
-                {periods.map(p => {
+                {periods.flatMap(p => {
                   const assign = schedule[di]?.[p.id]
                   const isFree = !assign?.className
-                  return (
+                  const cell = (
                     <div
                       key={p.id}
                       className={`period-cell ${isFree ? 'free-period' : 'class-period'} ${editMode ? 'period-editable' : ''}`}
@@ -217,6 +238,12 @@ export default function WeekView() {
                       )}
                     </div>
                   )
+                  if (p.id === 4) return [cell, (
+                    <div key="lunch-cell" className="lunch-cell" style={{ height: LUNCH_H }}>
+                      <span className="lunch-label">점심시간</span>
+                    </div>
+                  )]
+                  return [cell]
                 })}
 
                 {/* 퇴근 후 */}
