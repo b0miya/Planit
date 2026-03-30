@@ -4,6 +4,12 @@ import { getWeekDays, formatDate, getToday } from '../utils/date'
 
 const DAY_LABELS = ['월', '화', '수', '목', '금', '토', '일']
 
+function formatTimeInput(val) {
+  const digits = val.replace(/\D/g, '').slice(0, 4)
+  if (digits.length <= 2) return digits
+  return digits.slice(0, 2) + ':' + digits.slice(2)
+}
+
 export default function WeekView() {
   const {
     weekOffset, prevWeek, nextWeek, goToToday,
@@ -77,10 +83,12 @@ export default function WeekView() {
               <span className="period-label-text">{p.label}</span>
               {editMode ? (
                 <input
-                  type="time"
+                  type="text"
                   className="time-edit-input"
+                  placeholder="09:00"
+                  maxLength={5}
                   value={p.start}
-                  onChange={e => updatePeriod(p.id, 'start', e.target.value)}
+                  onChange={e => updatePeriod(p.id, 'start', formatTimeInput(e.target.value))}
                   title={`${p.label} 시작 시간`}
                 />
               ) : (
