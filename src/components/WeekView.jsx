@@ -15,7 +15,7 @@ export default function WeekView() {
     weekOffset, prevWeek, nextWeek, goToToday,
     selectedDate, setSelectedDate,
     timetable, dailyData,
-    setClassAssignment, updatePeriod,
+    setClassAssignment, updatePeriod, setWorkTime,
   } = useStore()
 
   const [editMode, setEditMode] = useState(false)
@@ -76,7 +76,18 @@ export default function WeekView() {
           </div>
           <div className="time-slot time-slot-edge" style={{ height: SLOT_H }}>
             <span className="slot-label">출근전</span>
-            <span className="time-text">{workStart}</span>
+            {editMode ? (
+              <input
+                type="text"
+                className="time-edit-input"
+                placeholder="08:30"
+                maxLength={5}
+                value={workStart}
+                onChange={e => setWorkTime(formatTimeInput(e.target.value), workEnd)}
+              />
+            ) : (
+              <span className="time-text">{workStart}</span>
+            )}
           </div>
           {periods.map(p => (
             <div key={p.id} className="time-slot" style={{ height: PERIOD_H }}>
@@ -98,7 +109,18 @@ export default function WeekView() {
           ))}
           <div className="time-slot time-slot-edge" style={{ height: SLOT_H }}>
             <span className="slot-label">퇴근후</span>
-            <span className="time-text">{workEnd}</span>
+            {editMode ? (
+              <input
+                type="text"
+                className="time-edit-input"
+                placeholder="17:00"
+                maxLength={5}
+                value={workEnd}
+                onChange={e => setWorkTime(workStart, formatTimeInput(e.target.value))}
+              />
+            ) : (
+              <span className="time-text">{workEnd}</span>
+            )}
           </div>
         </div>
 
